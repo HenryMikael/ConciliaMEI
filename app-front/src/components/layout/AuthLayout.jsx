@@ -1,5 +1,5 @@
 import { QrCode, ShieldCheck, WalletCards, Zap, CheckCircle2 } from 'lucide-react';
-import '../Styles.css';
+import '../../Styles.css';
 
 function Brand({ compact = false }) {
     return (

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ArrowRight, Building2 } from "lucide-react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import AuthLayout, { AuthField, AuthNotice } from "../../components/AuthLayout";
+import AuthLayout, { AuthField, AuthNotice } from "../../components/layout/AuthLayout";
 import { consultCnpj, SessionExpiredError } from "../../api/companyApi";
 import { formatCnpj, isValidCnpj, onlyDigits } from "../../lib/cnpj";
 

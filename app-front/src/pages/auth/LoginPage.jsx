@@ -6,7 +6,7 @@ import AuthLayout, {
     AuthField,
     AuthNotice,
     GoogleButton
-} from '../../components/AuthLayout';
+} from '../../components/layout/AuthLayout';
 import { login } from "../../api/authApi";
 
 export default function LoginPage() {

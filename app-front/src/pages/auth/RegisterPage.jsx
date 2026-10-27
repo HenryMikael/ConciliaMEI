@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight, Eye, EyeOff, FileText, LockKeyhole, Mail, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import AuthLayout, { AuthDivider, AuthField, AuthNotice, GoogleButton } from '../../components/AuthLayout';
+import AuthLayout, { AuthDivider, AuthField, AuthNotice, GoogleButton } from '../../components/layout/AuthLayout';
 import { register } from '../../api/authApi';
 
 export default function RegisterPage() {
