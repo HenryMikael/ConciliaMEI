@@ -124,7 +124,7 @@ export default function Navbar() {
               })}
 
               <Link
-                to="/auth/register"
+                to="/auth/signin"
                 onClick={() => setMenuOpen(false)}
                 className="mt-2 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-medium text-primary-foreground"
               >

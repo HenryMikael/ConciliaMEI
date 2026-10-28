@@ -17,9 +17,9 @@ return (
     <BrowserRouter>
       <Routes>
         {/* Rotas Públicas (Sem Navbar) */}
-        <Route path="/" element={<Navigate to="/auth/login" replace />} />
-        <Route path="/auth/login" element={<LoginPage />} />
-        <Route path="/auth/register" element={<RegisterPage />} />
+        <Route path="/" element={<Navigate to="/auth/sign-up" replace />} />
+        <Route path="/auth/sign-up" element={<LoginPage />} />
+        <Route path="/auth/signin" element={<RegisterPage />} />
         <Route path="/auth/register-company" element={<RegisterCompany />} />
         <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
         <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />

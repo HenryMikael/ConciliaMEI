@@ -124,7 +124,7 @@ export default function LoginPage() {
             >
                 Entrar com Google
             </GoogleButton>
-            <Link className="auth-login-link" to="/auth/register">Criar uma conta</Link>
+            <Link className="auth-login-link" to="/auth/signin">Criar uma conta</Link>
         </AuthLayout>
     );
 }

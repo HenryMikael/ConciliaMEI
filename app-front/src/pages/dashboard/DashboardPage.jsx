@@ -66,7 +66,7 @@ const STATUS_VARIANTS = {
 const MOCK_COMPANY = {
     name: "TechServiços Ltda.",
     cnpj: "12.345.678/0001-90",
-    userName: "Mikael",
+    userName: "karlos",
 };
 
 const MOCK_SUMMARY = {

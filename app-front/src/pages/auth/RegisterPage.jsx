@@ -95,7 +95,7 @@ export default function RegisterPage() {
             </form>
             <AuthDivider />
             <GoogleButton onClick={() => setNotice('O cadastro com Google ainda não está configurado.')}>Registrar com Google</GoogleButton>
-            <Link className="auth-login-link" to="/auth/login">Já tenho login</Link>
+            <Link className="auth-login-link" to="/auth/sign-up">Já tenho login</Link>
         </AuthLayout>
     );
 }
