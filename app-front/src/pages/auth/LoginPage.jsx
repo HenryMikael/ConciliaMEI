@@ -8,6 +8,7 @@ import AuthLayout, {
     GoogleButton
 } from '../../components/layout/AuthLayout';
 import { login } from "../../api/authApi";
+import LGPDPopup from '@/components/LGPDPopup';
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -25,21 +26,28 @@ export default function LoginPage() {
         setErro("");
         setCarregando(true);
 
+
         try {
-            const { name, token } = await login(email, password);
+            const respostaLogin = await login(email, password);
+
+            if (!respostaLogin?.token) {
+                throw new Error("O servidor não retornou um token de autenticação.");
+            }
+
+            const { name, token } = respostaLogin;
 
             localStorage.setItem("token", token);
-            localStorage.setItem("name", name);
+            localStorage.setItem("name", name || "");
 
-            navigate("/dashboard");
+            navigate("/dashboard", { replace: true });
 
         } catch (err) {
-            setErro(err.message);
+            setErro(err.message || "Erro ao tentar fazer login.");
         } finally {
             setCarregando(false);
         }
-    }
 
+    }
 
     return (
         <AuthLayout
@@ -53,14 +61,14 @@ export default function LoginPage() {
             }
         >
             <form className="auth-form" onSubmit={handleSubmit}>
-                <AuthField 
-                    id="login-email" 
-                    label="E-mail" 
-                    icon={Mail} 
-                    type="email" 
-                    placeholder="seu@email.com" 
-                    autoComplete="email" 
-                    required 
+                <AuthField
+                    id="login-email"
+                    label="E-mail"
+                    icon={Mail}
+                    type="email"
+                    placeholder="seu@email.com"
+                    autoComplete="email"
+                    required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
@@ -75,14 +83,14 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     trailing={
-                        <button 
-                            className="password-toggle" 
-                            type="button" 
-                            onClick={() => setShowPassword(!showPassword)} 
+                        <button
+                            className="password-toggle"
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
                             aria-label={
-                                showPassword 
-                                ? 'Ocultar senha' 
-                                : 'Mostrar senha'
+                                showPassword
+                                    ? 'Ocultar senha'
+                                    : 'Mostrar senha'
                             }
                         >
                             {showPassword ? <EyeOff /> : <Eye />}
@@ -125,6 +133,8 @@ export default function LoginPage() {
                 Entrar com Google
             </GoogleButton>
             <Link className="auth-login-link" to="/auth/signin">Criar uma conta</Link>
+
+            <LGPDPopup /> {/* LGPD */}
         </AuthLayout>
     );
 }

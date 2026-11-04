@@ -1,6 +1,7 @@
-const API_URL = "http://localhost:8080/api/empresas";
+import API_URL from "./apiConfig";
 
-// Lançado quando o token falta ou expirou. O backend responde 403 sem corpo nesses casos.
+const COMPANY_URL = `${API_URL}/api/empresas`;
+
 export class SessionExpiredError extends Error {
     constructor() {
         super("Sua sessão expirou. Faça login novamente.");
@@ -13,16 +14,17 @@ function getToken() {
 }
 
 async function request(path, options = {}) {
-    let response;
+    const token = getToken();
+    const headers = {
+        Accept: "application/json",
+        ...options.headers,
+    };
 
+    if (token) headers.Authorization = `Bearer ${token}`;
+
+    let response;
     try {
-        response = await fetch(`${API_URL}${path}`, {
-            ...options,
-            headers: {
-                ...options.headers,
-                Authorization: `Bearer ${getToken()}`,
-            },
-        });
+        response = await fetch(`${COMPANY_URL}${path}`, { ...options, headers });
     } catch {
         throw new Error("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
     }
@@ -38,34 +40,26 @@ async function request(path, options = {}) {
 
 async function parseResponse(response) {
     const data = await response.json().catch(() => null);
-
     if (!response.ok) {
-        throw new Error(data?.erro || "Ocorreu um erro inesperado. Tente novamente.");
+        throw new Error(data?.erro || `Não foi possível concluir a solicitação (HTTP ${response.status}).`);
     }
-
     return data;
 }
 
-// Passo 1 do cadastro: valida e consulta o CNPJ (não salva nada).
 export async function consultCnpj(cnpj) {
-    const response = await request(`/consulta-cnpj/${cnpj}`);
-    return parseResponse(response);
+    return parseResponse(await request(`/consulta-cnpj/${encodeURIComponent(cnpj)}`));
 }
 
-// Passo 2 do cadastro: o backend consulta o CNPJ de novo e salva a empresa do usuário logado.
 export async function registerCompany(cnpj) {
-    const response = await request("", {
+    return parseResponse(await request("", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cnpj }),
-    });
-    return parseResponse(response);
+    }));
 }
 
-// Retorna null se o usuário ainda não tiver empresa cadastrada.
 export async function getMyCompany() {
     const response = await request("/minha-empresa");
-
     if (response.status === 404) return null;
     return parseResponse(response);
 }

@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useState } from 'react';
 import Navbar from './components/Navbar';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import NotasFiscais from './pages/fiscal/NotasFiscais';
@@ -8,28 +7,33 @@ import Pagamentos from './pages/fiscal/Pagamentos';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import RegisterCompany from './pages/auth/RegisterCompany';
+import CompanyConfirmation from './pages/auth/CompanyConfirmation';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+import PrivateRoute from './routes/PrivateRoute';
+import HeroSection from './pages/hero/HeroSection';
 
 function App() {
-  // TODO: trocar pelo usuário do login (JWT), no formato { name, cnpj }
-return (
+  return (
     <BrowserRouter>
       <Routes>
         {/* Rotas Públicas (Sem Navbar) */}
-        <Route path="/" element={<Navigate to="/auth/sign-up" replace />} />
+        <Route path="/" element={<HeroSection />} />
         <Route path="/auth/sign-up" element={<LoginPage />} />
         <Route path="/auth/signin" element={<RegisterPage />} />
         <Route path="/auth/register-company" element={<RegisterCompany />} />
+        <Route path="/auth/register-company/confirm" element={<CompanyConfirmation />} />
         <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
         <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
 
         {/* Rotas Privadas (Com Navbar) */}
-        <Route element={< Navbar/>}>
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/notas" element={<NotasFiscais />} />
-          <Route path="/conciliacao" element={<Conciliacao />} />
-          <Route path="/pagamentos" element={<Pagamentos />} />
+        <Route element={<PrivateRoute />}>
+          <Route element={<Navbar />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/notas" element={<NotasFiscais />} />
+            <Route path="/conciliacao" element={<Conciliacao />} />
+            <Route path="/pagamentos" element={<Pagamentos />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

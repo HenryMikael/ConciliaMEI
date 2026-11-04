@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
-import AuthLayout, { AuthNotice } from "../../components/AuthLayout";
+import AuthLayout, { AuthNotice } from "../../components/layout/AuthLayout";
 import { registerCompany, SessionExpiredError } from "../../api/companyApi";
 import { formatCnpj } from "../../lib/cnpj";
 
@@ -16,7 +16,7 @@ export default function CompanyConfirmation() {
     const company = state?.company;
 
     if (!localStorage.getItem("token")) {
-        return <Navigate to="/auth/login" replace />;
+        return <Navigate to="/auth/sign-up" replace />;
     }
 
     // Quem recarrega a página ou chega direto aqui perde os dados da consulta.
@@ -34,7 +34,7 @@ export default function CompanyConfirmation() {
             setDone(true);
         } catch (err) {
             if (err instanceof SessionExpiredError) {
-                navigate("/auth/login", { replace: true });
+                navigate("/auth/sign-up", { replace: true });
                 return;
             }
             setError(err.message);
