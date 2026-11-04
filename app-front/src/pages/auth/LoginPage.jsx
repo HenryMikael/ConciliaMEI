@@ -8,7 +8,7 @@ import AuthLayout, {
     GoogleButton
 } from '../../components/layout/AuthLayout';
 import { login } from "../../api/authApi";
-import LGPDPopup from '@/components/LGPDPopup';
+import LGPDpopup from '@/components/LGPDpopup';
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -134,7 +134,7 @@ export default function LoginPage() {
             </GoogleButton>
             <Link className="auth-login-link" to="/auth/signin">Criar uma conta</Link>
 
-            <LGPDPopup /> {/* LGPD */}
+            <LGPDpopup /> {/* LGPD */}
         </AuthLayout>
     );
 }
