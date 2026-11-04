@@ -3,9 +3,9 @@ import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { X } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { LGPDNoticeBody, LGPDNoticeHeader } from "@/components/LGPDNotice";
-import { LGPD_DIALOG_CLASS, getLGPDAcceptedAt } from "@/lib/lgpd";
+import { Button } from "../../components/ui/button";
+import { LGPDNoticeBody, LGPDNoticeHeader } from "../../components/LGPDNotice";
+import { LGPD_DIALOG_CLASS, getLGPDAcceptedAt } from "../../lib/lgpd";
 
 function acceptedLabel(iso) {
     if (!iso) return "Aviso ainda não confirmado neste navegador.";
