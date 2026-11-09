@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
     ArrowDownRight,
@@ -128,6 +129,39 @@ function BrandMark() {
 }
 
 export default function HeroSection() {
+    useEffect(() => {
+        const landing = document.querySelector('.cm-landing');
+        if (!landing || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        const elements = landing.querySelectorAll([
+            '.cm-hero-copy', '.cm-hero-visual', '.cm-signal-inner',
+            '.cm-about-layout', '.cm-section-heading', '.cm-process-card',
+            '.cm-benefit', '.cm-comparison-card', '.cm-contact-inner',
+            '.cm-footer-main'
+        ].join(', '));
+
+        landing.classList.add('cm-motion-ready');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -45px 0px' });
+
+        elements.forEach((element) => {
+            element.classList.add('cm-reveal');
+            observer.observe(element);
+        });
+
+        return () => {
+            observer.disconnect();
+            landing.classList.remove('cm-motion-ready');
+            elements.forEach((element) => element.classList.remove('cm-reveal', 'is-visible'));
+        };
+    }, []);
+
     return (
         <div className="cm-landing" id="home">
             <header className="cm-header">
