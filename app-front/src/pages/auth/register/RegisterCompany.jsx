@@ -28,17 +28,20 @@ function ProgressStep({ number, title, description, completed, active }) {
     return (
         <div className="flex min-w-0 items-center gap-3">
             <span
-                className={`grid size-9 shrink-0 place-items-center rounded-full border text-sm font-semibold transition-colors ${completed
+                className={`grid size-9 shrink-0 place-items-center rounded-full border text-sm font-semibold transition-colors ${
+                    completed
                         ? "border-(--brand-primary) bg-(--brand-primary) text-white"
                         : active
                             ? "border-(--brand-primary) bg-(--brand-primary-soft) text-(--brand-primary)"
                             : "border-(--border-default) bg-(--surface-card) text-(--text-muted)"
-                    }`}
+                }`}
             >
                 {completed ? <Check size={17} /> : number}
             </span>
             <span className="min-w-0">
-                <span className={`block truncate text-sm font-semibold ${active || completed ? "text-(--text-primary)" : "text-(--text-muted)"}`}>
+                <span className={`block truncate text-sm font-semibold ${
+                    active || completed ? "text-(--text-primary)" : "text-(--text-muted)"
+                }`}>
                     {title}
                 </span>
                 <span className="mt-0.5 block truncate text-xs text-(--text-muted)">
@@ -123,12 +126,8 @@ export default function RegisterCompany() {
 
                 <div className="mb-8 rounded-2xl border border-(--border-default) bg-(--surface-card) p-5 shadow-sm sm:p-6">
                     <div className="mb-5 flex items-center justify-between gap-3">
-                        <span className="text-sm font-semibold text-(--text-primary)">
-                            Etapa 2 de 2
-                        </span>
-                        <span className="text-xs font-medium text-(--text-secondary)">
-                            Cadastro da empresa
-                        </span>
+                        <span className="text-sm font-semibold text-(--text-primary)">Etapa 2 de 2</span>
+                        <span className="text-xs font-medium text-(--text-secondary)">Cadastro da empresa</span>
                     </div>
 
                     <div className="mb-6 h-1.5 overflow-hidden rounded-full bg-(--surface-soft)">
@@ -136,18 +135,8 @@ export default function RegisterCompany() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <ProgressStep
-                            number="1"
-                            title="Conta criada"
-                            description="Concluído"
-                            completed
-                        />
-                        <ProgressStep
-                            number="2"
-                            title="Sua empresa"
-                            description="Etapa atual"
-                            active
-                        />
+                        <ProgressStep number="1" title="Conta criada" description="Concluído" completed />
+                        <ProgressStep number="2" title="Sua empresa" description="Etapa atual" active />
                     </div>
                 </div>
 
@@ -157,9 +146,7 @@ export default function RegisterCompany() {
                             <Building2 size={21} />
                         </span>
                         <div>
-                            <h2 className="text-base font-semibold text-(--text-primary)">
-                                Identificação da empresa
-                            </h2>
+                            <h2 className="text-base font-semibold text-(--text-primary)">Identificação da empresa</h2>
                             <p className="mt-1 text-sm leading-5 text-(--text-secondary)">
                                 Usaremos o CNPJ para consultar os dados cadastrais disponíveis.
                             </p>
@@ -167,10 +154,7 @@ export default function RegisterCompany() {
                     </div>
 
                     <form onSubmit={handleSubmit} noValidate>
-                        <label
-                            htmlFor="company-cnpj"
-                            className="mb-2 block text-sm font-semibold text-(--text-primary)"
-                        >
+                        <label htmlFor="company-cnpj" className="mb-2 block text-sm font-semibold text-(--text-primary)">
                             CNPJ
                         </label>
                         <input
@@ -217,7 +201,7 @@ export default function RegisterCompany() {
                         </button>
                     </form>
 
-                    <div className="mt-5 flex items-start gap-2.5 rounded-xl bg-(--surface-soft)] p-3.5">
+                    <div className="mt-5 flex items-start gap-2.5 rounded-xl bg-(--surface-soft) p-3.5">
                         <ShieldCheck size={17} className="mt-0.5 shrink-0 text-(--brand-primary)" />
                         <p className="text-xs leading-5 text-(--text-secondary)">
                             Seus dados são utilizados para configurar sua empresa no ConciliaMEI e ficam protegidos.
