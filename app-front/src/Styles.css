@@ -92,6 +92,29 @@
 }
 
 :root {
+  /* Paleta compartilhada da aplicação */
+  --brand-primary: #246bff;
+  --brand-primary-strong: #2563eb;
+  --brand-primary-hover: #155be9;
+  --brand-primary-soft: #eff6ff;
+  --brand-ink: #102b61;
+
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+
+  --surface-page: #f8fafc;
+  --surface-card: #ffffff;
+  --surface-soft: #f1f5f9;
+
+  --border-default: #e2e8f0;
+  --border-brand: #d8e5f8;
+
+  --status-success: #08cba7;
+  --status-info: #3b82f6;
+  --status-warning: #f59e0b;
+  --status-danger: #dc2626;
+
   --radius: 0.625rem;
 
   --background: oklch(1 0 0);
@@ -215,10 +238,10 @@
 
 @layer auth {
   .auth-page {
-    --auth-ink: #102b61;
-    --auth-blue: #246bff;
-    --auth-muted: #7892bd;
-    --auth-line: #d8e5f8;
+    --auth-ink: var(--brand-ink);
+    --auth-blue: var(--brand-primary);
+    --auth-muted: #7892bd; /* tom específico do texto auxiliar da autenticação */
+    --auth-line: var(--border-brand);
     display: grid;
     grid-template-columns: 49.4% 50.6%;
     min-height: 100vh;
@@ -1422,15 +1445,15 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap');
 
 .cm-landing {
-  --cm-paper: #f8fafc; /* Off-white levemente azulado */
-  --cm-white: #fff;
-  --cm-ink: #1e293b; /* Azul-cinza bem escuro para o texto principal */
-  --cm-body: #64748b;
-  --cm-muted: #94a3b8;
-  --cm-line: #e2e8f0;
-  --cm-accent: #3b82f6; /* Azul Executivo*/
-  --cm-accent-dark: #2563eb;
-  --cm-accent-pale: #eff6ff;
+  --cm-paper: var(--surface-page);
+  --cm-white: var(--surface-card);
+  --cm-ink: var(--text-primary);
+  --cm-body: var(--text-secondary);
+  --cm-muted: var(--text-muted);
+  --cm-line: var(--border-default);
+  --cm-accent: var(--status-info);
+  --cm-accent-dark: var(--brand-primary-strong);
+  --cm-accent-pale: var(--brand-primary-soft);
   --cm-serif: "Playfair Display", Georgia, serif;
   --cm-sans: "DM Sans", Inter, sans-serif;
   overflow: hidden;

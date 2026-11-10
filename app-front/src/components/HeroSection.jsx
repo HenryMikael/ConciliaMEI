@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import {
     ArrowDownRight,
-    ArrowRight,
     ArrowUpRight,
     Check,
     CheckCircle2,
@@ -11,7 +10,6 @@ import {
     FileSpreadsheet,
     FileText,
     GitCompareArrows,
-    Mail,
     ScanSearch,
     ShieldCheck,
     Wallet,

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Download, Eye, FileText, Paperclip, Search, X } from "lucide-react";
 
 const pagamentos = [

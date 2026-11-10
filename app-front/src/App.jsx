@@ -1,17 +1,18 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import DashboardPage from './pages/dashboard/DashboardPage';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navbar from './components/ui/Navbar';
+import HeroSection from './components/HeroSection';
 import NotasFiscais from './pages/fiscal/NotasFiscais';
 import Conciliacao from './pages/fiscal/Conciliacao';
 import Pagamentos from './pages/fiscal/Pagamentos';
-import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
-import RegisterCompany from './pages/auth/RegisterCompany';
-import CompanyConfirmation from './pages/auth/CompanyConfirmation';
-import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
-import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import PrivateRoute from './routes/PrivateRoute';
-import HeroSection from './pages/hero/HeroSection';
+import LoginPage from './pages/auth/login/LoginPage';
+import RegisterPage from './pages/auth/register/RegisterPage';
+import RegisterCompany from './pages/auth/register/RegisterCompany';
+import CompanyConfirmation from './pages/auth/register/CompanyConfirmation';
+import ResetPasswordPage from './pages/auth/password-recovery/ResetPasswordPage';
+import ForgotPasswordPage from './pages/auth/password-recovery/ForgotPasswordPage';
+import DashboardPage from './pages/dashboard/DashboardPage';
+
 
 function App() {
   return (

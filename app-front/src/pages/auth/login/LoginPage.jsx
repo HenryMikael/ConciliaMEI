@@ -1,14 +1,9 @@
 import { useState } from 'react';
-import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail, UserRoundPlus } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import AuthLayout, {
-    AuthDivider,
-    AuthField,
-    AuthNotice,
-    GoogleButton
-} from '../../components/layout/AuthLayout';
-import { login } from "../../api/authApi";
-import LGPDpopup from '../../components/LGPDpopUp';
+import AuthLayout, { AuthDivider, AuthField, AuthNotice, GoogleButton } from '../../../components/layout/AuthLayout';
+import { login } from "../../../api/authApi";
+import LGPDpopup from '../../../components/ui/LGPDpopup';
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
