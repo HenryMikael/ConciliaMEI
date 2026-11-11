@@ -1,4 +1,5 @@
 import API_URL from "./apiConfig";
+import { SessionExpiredError } from "./companyApi";
 
 const DASHBOARD_URL = `${API_URL}/api/dashboard`;
 const DOCUMENTS_URL = `${API_URL}/api/documents`;
@@ -19,7 +20,7 @@ async function request(url) {
     if (response.status === 401 || response.status === 403) {
         localStorage.removeItem("token");
         localStorage.removeItem("name");
-        throw new Error("Sua sessão expirou. Faça login novamente.");
+        throw new SessionExpiredError();
     }
 
     const data = await response.json().catch(() => null);
@@ -36,8 +37,9 @@ export function getDashboardSummary(period) {
     return request(`${DASHBOARD_URL}?period=${encodeURIComponent(period)}`);
 }
 
-export function getDashboardDocuments({ status, page = 0, size = 8 }) {
+export function getDashboardDocuments({ status, period, page = 0, size = 8 }) {
     const params = new URLSearchParams({ page: String(page), size: String(size) });
+    if (period) params.set("period", period);
     if (status && status !== "todas") params.set("status", status);
 
     return request(`${DOCUMENTS_URL}?${params.toString()}`);
