@@ -23,7 +23,7 @@ export default function RegisterPage() {
             const {name: nomeSalvo, token } = await register (name, email, password);
             localStorage.setItem("token", token);
             localStorage.setItem("name", nomeSalvo);
-            navigate("/dashboard");
+            navigate("/auth/register-company", { replace: true });
         } catch (err) {
             setErro(err.message);
         } finally {
