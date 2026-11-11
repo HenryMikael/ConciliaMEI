@@ -3,6 +3,7 @@ import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout, { AuthDivider, AuthField, AuthNotice, GoogleButton } from '../../../components/layout/AuthLayout';
 import { login } from "../../../api/authApi";
+import { getMyCompany } from "../../../api/companyApi";
 import LGPDpopup from '../../../components/ui/LGPDpopup';
 
 export default function LoginPage() {
@@ -34,7 +35,8 @@ export default function LoginPage() {
             localStorage.setItem("token", token);
             localStorage.setItem("name", name || "");
 
-            navigate("/dashboard", { replace: true });
+            const company = await getMyCompany();
+            navigate(company ? "/dashboard" : "/auth/register-company", { replace: true });
 
         } catch (err) {
             setErro(err.message || "Erro ao tentar fazer login.");
