@@ -1,4 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getMyCompany, SessionExpiredError } from "@/api/companyApi";
+import { formatCnpj } from "@/lib/cnpj";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -61,12 +64,6 @@ const STATUS_VARIANTS = {
             "bg-status-discrepant/15 text-status-discrepant border-status-discrepant/20 hover:bg-status-discrepant/20",
         icon: <AlertTriangle className="h-4 w-4 text-status-discrepant" />,
     },
-};
-
-const MOCK_COMPANY = {
-    name: "TechServiços Ltda.",
-    cnpj: "12.345.678/0001-90",
-    userName: "karlos",
 };
 
 const MOCK_SUMMARY = {
@@ -245,6 +242,37 @@ function NoteMobileCard({ note }) {
 
 function DashboardPage() {
     const [activeTab, setActiveTab] = useState("todas");
+    const [company, setCompany] = useState(null);
+    const [loadingCompany, setLoadingCompany] = useState(true);
+    const [companyError, setCompanyError] = useState("");
+    const navigate = useNavigate();
+    const userName = localStorage.getItem("name") || "usuário";
+
+    useEffect(() => {
+        async function loadCompany() {
+            try {
+                const data = await getMyCompany();
+
+                if (!data) {
+                    navigate("/auth/register-company", { replace: true });
+                    return;
+                }
+
+                setCompany(data);
+            } catch (error) {
+                if (error instanceof SessionExpiredError) {
+                    navigate("/auth/sign-up", { replace: true });
+                    return;
+                }
+
+                setCompanyError(error.message || "Não foi possível carregar os dados da empresa.");
+            } finally {
+                setLoadingCompany(false);
+            }
+        }
+
+        loadCompany();
+    }, [navigate]);
 
     const filteredNotes = useMemo(() => {
         if (activeTab === "todas") return MOCK_NOTES;
@@ -269,16 +297,21 @@ function DashboardPage() {
         <div className="min-h-screen bg-background">
             <header className="border-b bg-card">
                 <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 sm:gap-4 sm:px-6 sm:py-6 lg:px-8">
+                    {companyError && (
+                        <div role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                            {companyError}
+                        </div>
+                    )}
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                         <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground sm:text-sm">
                                 <Building2 className="h-4 w-4 shrink-0" />
-                                <span className="truncate">{MOCK_COMPANY.name}</span>
+                                <span className="truncate">{company?.nomeFantasia || company?.razaoSocial || (loadingCompany ? "Carregando empresa..." : "Empresa não identificada")}</span>
                                 <span className="hidden text-border sm:inline">•</span>
-                                <span className="hidden sm:inline">CNPJ {MOCK_COMPANY.cnpj}</span>
+                                <span className="hidden sm:inline">CNPJ {company?.cnpj ? formatCnpj(company.cnpj) : "—"}</span>
                             </div>
                             <h1 className="mt-1 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
-                                Olá, {MOCK_COMPANY.userName}
+                                Olá, {userName}
                             </h1>
                             <p className="text-xs text-muted-foreground sm:text-sm">
                                 Acompanhe suas NFS-e e recebimentos de{" "}
