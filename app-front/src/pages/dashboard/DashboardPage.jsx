@@ -139,6 +139,7 @@ function NoteMobileCard({ note, onOpen }) {
                 {note.pendingReason && (
                     <p className="rounded-md bg-muted/60 p-2 text-xs text-muted-foreground">{note.pendingReason}</p>
                 )}
+                {note.hasSuggestion && <Badge variant="secondary" className="w-fit">Sugestão de conciliação disponível</Badge>}
                 <div className="flex items-center justify-between border-t pt-3">
                     <div>
                         <p className="text-[11px] text-muted-foreground">Valor</p>
@@ -349,6 +350,7 @@ function DashboardPage() {
                                     </CardHeader>
                                     <CardContent className="space-y-3 p-3 pt-0 sm:p-6 sm:pt-0">
                                         <p className="text-xs text-muted-foreground sm:text-sm">{note.pendingReason || "Pendência sem descrição."}</p>
+                                        {note.hasSuggestion && <Badge variant="secondary" className="w-fit">Sugestão de conciliação disponível</Badge>}
                                         <div className="flex items-center justify-between gap-2">
                                             <span className="text-sm font-medium">{formatCurrency(note.value)}</span>
                                             <Button variant="ghost" size="sm" className="h-8 gap-1 text-status-analysis" onClick={openDocument}>
