@@ -114,7 +114,7 @@ export default function CompanyConfirmation() {
                             Empresa cadastrada!
                         </h1>
                         <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-(--text-secondary)">
-                            {registeredCompany.razaoSocial || "Os dados da sua empresa"} foi vinculada à sua conta. Agora você já pode acessar os recursos do ConciliaMEI.
+                            Cadastro de {registeredCompany.razaoSocial || "empresa"} concluído e vinculado à sua conta. Agora você já pode acessar os recursos do ConciliaMEI.
                         </p>
                         <Link
                             to="/dashboard"
