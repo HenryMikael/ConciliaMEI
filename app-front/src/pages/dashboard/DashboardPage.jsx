@@ -217,7 +217,8 @@ function DashboardPage() {
                 if (active) setSummary({ ...EMPTY_SUMMARY, ...data, counts: data?.counts || {} });
             })
             .catch((error) => {
-                if (active) setSummaryError(error.message || "Não foi possível carregar o resumo.");
+                if (error instanceof SessionExpiredError) navigate("/auth/sign-up", { replace: true });
+                else if (active) setSummaryError(error.message || "Não foi possível carregar o resumo.");
             })
             .finally(() => {
                 if (active) setSummaryLoading(false);
@@ -231,20 +232,21 @@ function DashboardPage() {
         setNotesLoading(true);
         setNotesError("");
 
-        getDashboardDocuments({ status: activeTab, page: 0, size: 8 })
+        getDashboardDocuments({ status: activeTab, period, page: 0, size: 8 })
             .then((data) => {
                 if (!active) return;
                 setNotes(Array.isArray(data) ? data : data?.content || []);
             })
             .catch((error) => {
-                if (active) setNotesError(error.message || "Não foi possível carregar os documentos.");
+                if (error instanceof SessionExpiredError) navigate("/auth/sign-up", { replace: true });
+                else if (active) setNotesError(error.message || "Não foi possível carregar os documentos.");
             })
             .finally(() => {
                 if (active) setNotesLoading(false);
             });
 
         return () => { active = false; };
-    }, [activeTab]);
+    }, [activeTab, period]);
 
     const loadAttention = useCallback(() => {
         let active = true;
@@ -256,7 +258,8 @@ function DashboardPage() {
                 if (active) setAttentionNotes(Array.isArray(data) ? data : data?.content || []);
             })
             .catch((error) => {
-                if (active) setAttentionError(error.message || "Não foi possível carregar as pendências.");
+                if (error instanceof SessionExpiredError) navigate("/auth/sign-up", { replace: true });
+                else if (active) setAttentionError(error.message || "Não foi possível carregar as pendências.");
             })
             .finally(() => {
                 if (active) setAttentionLoading(false);
