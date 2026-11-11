@@ -58,7 +58,7 @@ export default function CompanyConfirmation() {
     const navigate = useNavigate();
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
-    const [done, setDone] = useState(false);
+    const [registeredCompany, setRegisteredCompany] = useState(null);
 
     const company = state?.company;
 
@@ -77,8 +77,8 @@ export default function CompanyConfirmation() {
         setSaving(true);
 
         try {
-            await registerCompany(company.cnpj);
-            setDone(true);
+            const savedCompany = await registerCompany(company.cnpj);
+            setRegisteredCompany(savedCompany);
         } catch (err) {
             if (err instanceof SessionExpiredError) {
                 navigate("/auth/sign-up", { replace: true });
@@ -102,7 +102,7 @@ export default function CompanyConfirmation() {
             </header>
 
             <section className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center py-10">
-                {done ? (
+                {registeredCompany ? (
                     <div className="rounded-2xl border border-(--border-default) bg-(--surface-card) p-6 text-center shadow-sm sm:p-9">
                         <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-(--brand-primary-soft) text-(--brand-primary)">
                             <CircleCheck size={29} />
@@ -114,7 +114,7 @@ export default function CompanyConfirmation() {
                             Empresa cadastrada!
                         </h1>
                         <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-(--text-secondary)">
-                            Os dados da sua empresa foram salvos. Agora você já pode acessar os recursos do ConciliaMEI.
+                            {registeredCompany.razaoSocial || "Os dados da sua empresa"} foi vinculada à sua conta. Agora você já pode acessar os recursos do ConciliaMEI.
                         </p>
                         <Link
                             to="/dashboard"
