@@ -15,6 +15,7 @@ const links = [
   { label: "Notas", href: "/notas" },
   { label: "Conciliação", href: "/conciliacao" },
   { label: "Pagamentos", href: "/pagamentos" },
+  { label: "Configurações", href: "/configuracoes" },
 ];
 
 export default function Navbar() {

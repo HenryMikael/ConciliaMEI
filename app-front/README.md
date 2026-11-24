@@ -1,79 +1,97 @@
 # ConciliaMEI — Escopo e especificação do projeto
 
-**Versão:** 2.0  
-**Status:** Escopo do MVP definido; implementação do novo domínio financeiro em preparação.
+**Versão:** 2.1 
+**Status:** Novo escopo definido; adequação do domínio financeiro em preparação.
+
+---
 
 ## 1. Visão geral
 
-O **ConciliaMEI** é uma plataforma web de controle financeiro e conciliação inteligente, destinada a pessoas físicas, MEIs e pequenas empresas.
+O **ConciliaMEI** é uma plataforma web de organização financeira e conciliação bancária destinada a pessoas físicas, MEIs e trabalhadores autônomos.
 
-O sistema permite organizar contas, registrar receitas e despesas, importar movimentações bancárias e armazenar documentos fiscais e comprovantes. Seu principal diferencial é relacionar movimentações financeiras com documentos correspondentes, facilitando a conferência de pagamentos, recebimentos e despesas.
+O sistema permite importar extratos bancários, organizar receitas e despesas, categorizar movimentações e acompanhar a situação financeira do usuário.
 
-O projeto não pretende ser um ERP completo nem um sistema de emissão de notas fiscais. A emissão continuará sendo realizada por sistemas externos.
+Seu principal diferencial é automatizar a organização das movimentações financeiras e permitir a conciliação entre registros manuais e transações identificadas nos extratos bancários.
+
+O projeto não pretende ser um ERP, sistema contábil ou plataforma de gestão fiscal. Seu objetivo é oferecer uma maneira simples de entender, organizar e acompanhar o dinheiro que entra e sai das contas do usuário.
+
+### Objetivos principais
+
+- Centralizar movimentações financeiras.
+- Facilitar a importação de extratos bancários.
+- Automatizar a categorização de receitas e despesas.
+- Identificar movimentações duplicadas.
+- Permitir conciliação entre registros manuais e bancários.
+- Apresentar indicadores financeiros de maneira clara.
 
 ## 2. Público-alvo
 
 - Pessoas físicas que desejam organizar suas finanças.
 - MEIs que precisam acompanhar receitas e despesas.
-- Pequenas empresas que desejam conferir movimentações financeiras e documentos fiscais.
+- Trabalhadores autônomos que desejam controlar seus recebimentos e gastos.
 
-O sistema terá suporte a perfis pessoais e empresariais, mas o MVP utilizará apenas um perfil financeiro por usuário.
+O sistema utilizará um usuário como proprietário dos dados financeiros, sem exigir cadastro empresarial, CNPJ ou razão social.
+
+Cada usuário poderá cadastrar uma ou mais contas financeiras.
 
 ## 3. Decisões arquiteturais fechadas
 
 | Área | Decisão |
 |---|---|
-| Perfis financeiros | Um perfil por usuário no MVP |
-| Tipos de perfil | Pessoal e empresarial |
+| Público-alvo | Pessoas físicas, MEIs e autônomos |
+| Identificação | Usuário autenticado, sem perfil empresarial obrigatório |
+| Contas financeiras | Múltiplas contas por usuário |
 | Importação bancária | OFX e CSV no MVP |
 | Integração bancária | Open Finance em fase futura |
-| Documentos | XML e PDF desde o MVP |
-| Conciliação | Sugestões com confirmação do usuário |
+| Movimentações | Importadas e cadastradas manualmente |
+| Categorização | Organização automática com possibilidade de correção |
+| Conciliação | Organização automática e conciliação manual |
+| Documentos fiscais | Fora do escopo do MVP |
 | Emissão de notas | Fora do escopo |
-| Armazenamento de arquivos | Backblaze B2 |
+| Armazenamento de arquivos | Processamento dos extratos sem necessidade de armazenamento permanente |
 | Banco de dados | MySQL |
-| Identificadores | UUID em formato String, mantendo o padrão atual do backend |
+| Identificadores | UUID em formato String |
+| Isolamento | Todos os registros financeiros vinculados ao usuário autenticado |
 
 ## 4. Tecnologias
 
 ### Backend
-- Java 21
-- Spring Boot
-- Spring Data JPA / Hibernate
-- Spring Security
-- JWT
-- MySQL
-- Backblaze B2 para armazenamento de documentos
+- Java 21.
+- Spring Boot.
+- Spring Data JPA / Hibernate.
+- Spring Security.
+- JWT.
+- MySQL.
 
 ### Frontend
-- React
-- Vite
-- Tailwind CSS
-- shadcn/ui
+- React.
+- Vite.
+- Tailwind CSS.
+- shadcn/ui.
 
 ### Infraestrutura atual
-- Backend: Render
-- Frontend: Netlify
-- Banco de dados: Aiven
-- Armazenamento: Backblaze B2
+- Backend: Render.
+- Frontend: Netlify.
+- Banco de dados: Aiven.
+
+O Backblaze B2 deixa de ser necessário no MVP, pois não haverá armazenamento de notas fiscais, comprovantes ou documentos financeiros.
 
 ## 5. Funcionalidades do sistema
 
-### RF01 — Perfil financeiro
+### RF01 — Usuário e autenticação
 
-O usuário terá um perfil financeiro associado à sua conta.
+O sistema utilizará a autenticação existente.
 
 Informações:
-- Tipo: pessoal ou empresarial.
-- Nome de identificação.
-- CPF ou CNPJ, quando aplicável.
-- Data de criação.
+- Nome.
+- E-mail.
+- Senha.
 
 Regras:
-- Cada usuário terá exatamente um perfil no MVP.
-- O perfil será criado durante ou após o cadastro do usuário.
-- Dados financeiros e documentos deverão estar vinculados ao perfil.
-- A arquitetura deverá permitir múltiplos perfis futuramente.
+- Cada usuário terá acesso somente aos próprios dados financeiros.
+- Não será necessário criar um perfil financeiro separado.
+- Não será obrigatório informar CPF ou CNPJ.
+- As contas, movimentações e categorias estarão vinculadas ao usuário autenticado.
 
 ### RF02 — Contas financeiras
 
@@ -95,16 +113,22 @@ Informações:
 - Situação: ativa ou inativa.
 
 Funcionalidades:
-- Cadastrar, consultar e editar contas.
+- Cadastrar contas.
+- Consultar contas.
+- Editar informações.
 - Desativar contas.
 - Consultar saldo calculado.
-- Consultar histórico de movimentações.
+- Consultar movimentações por conta.
 
-O saldo atual será calculado considerando o saldo inicial e as movimentações posteriores à data de referência.
+Regras:
+- Um usuário poderá possuir várias contas.
+- Cada conta pertencerá a um único usuário.
+- O saldo será calculado a partir do saldo inicial e das movimentações posteriores à data de referência.
+- Desativar uma conta não deverá apagar seu histórico financeiro.
 
 ### RF03 — Movimentações financeiras
 
-Permitir registrar e consultar movimentações financeiras.
+Permitir registrar, consultar e organizar movimentações financeiras.
 
 Tipos:
 - Receita (`INCOME`).
@@ -113,7 +137,7 @@ Tipos:
 - Transferência de saída (`TRANSFER_OUT`).
 
 Origens:
-- Manual (`MANUAL`).
+- Cadastro manual (`MANUAL`).
 - Importação bancária (`BANK_IMPORT`).
 
 Informações:
@@ -125,23 +149,26 @@ Informações:
 - Data da movimentação.
 - Origem.
 - Identificador externo, quando disponível.
+- Identificação da importação, quando aplicável.
 
 Funcionalidades:
 - Cadastrar receitas e despesas manualmente.
-- Consultar e editar movimentações.
+- Consultar movimentações.
+- Editar movimentações.
 - Categorizar movimentações.
-- Importar extratos OFX e CSV.
-- Identificar possíveis movimentações duplicadas.
-- Consultar movimentações por período e conta.
+- Filtrar por período, conta e categoria.
+- Identificar possíveis duplicidades.
+- Consultar histórico financeiro.
 
 Regras:
 - Valores serão armazenados como `BigDecimal`, sempre positivos.
-- O tipo determina se o valor representa entrada ou saída.
-- Transferências entre contas próprias não serão contabilizadas como receitas ou despesas.
+- O tipo determinará se o valor representa entrada ou saída.
+- Transferências entre contas próprias não serão consideradas receitas ou despesas.
 - Uma transferência será representada por duas movimentações relacionadas.
-- Movimentações poderão existir sem documentos fiscais correspondentes.
+- Movimentações poderão existir sem conciliação.
+- Registros importados deverão preservar a identificação da origem bancária.
 
-### RF04 — Categorias
+### RF04 — Categorias financeiras
 
 Permitir classificar receitas e despesas.
 
@@ -153,180 +180,243 @@ Categorias iniciais sugeridas:
 - Moradia.
 - Saúde.
 - Educação.
+- Lazer.
+- Compras.
+- Serviços.
 - Impostos.
 - Outros.
 
 **Receitas**
 - Salário.
-- Vendas.
 - Prestação de serviços.
+- Vendas.
+- Transferências recebidas.
 - Outros.
 
-As categorias serão vinculadas ao perfil financeiro e poderão ser personalizadas futuramente.
-
-### RF05 — Documentos fiscais e comprovantes
-
-Permitir importar, armazenar e consultar documentos financeiros.
-
-Formatos aceitos:
-- XML.
-- PDF.
-
-Tipos de documentos:
-- NF-e.
-- NFS-e.
-- Comprovantes.
-- Outros documentos.
-
-Informações extraídas quando disponíveis:
-- Número do documento.
-- CPF/CNPJ do emissor.
-- CPF/CNPJ do destinatário.
-- Valor.
-- Data de emissão.
-- Tipo do documento.
-- Identificação do arquivo.
-
 Funcionalidades:
-- Upload de XML e PDF.
-- Armazenamento no Backblaze B2.
-- Extração de informações dos XMLs.
-- Extração de texto de PDFs quando possível.
-- Consulta dos documentos importados.
-- Identificação de arquivos duplicados.
-- Identificação de possíveis documentos fiscais repetidos.
+- Disponibilizar categorias padrão.
+- Categorizar movimentações.
+- Permitir alteração manual da categoria.
+- Sugerir categorias com base na descrição da movimentação.
+- Permitir personalização futura.
 
 Regras:
-- O arquivo original será preservado.
-- O banco armazenará a chave do arquivo no B2 e seus metadados.
-- Um PDF sem texto extraível continuará disponível para consulta.
-- XML de NF-e e XML de NFS-e terão processadores específicos.
-- A identificação de arquivos iguais será feita por hash, sem depender exclusivamente dele para identificar notas repetidas.
+- As categorias serão vinculadas ao usuário.
+- Cada categoria terá um tipo: receita ou despesa.
+- O sistema poderá utilizar regras baseadas em descrições e padrões de movimentações para sugerir categorias.
+- O usuário poderá corrigir qualquer classificação automática.
 
-### RF06 — Conciliação financeira
+A categorização automática não dependerá obrigatoriamente de inteligência artificial. O MVP poderá utilizar regras e correspondência de palavras-chave.
 
-Funcionalidade central do sistema.
+### RF05 — Importação de extratos bancários
 
-Relacionar movimentações financeiras com documentos fiscais e comprovantes.
+Funcionalidade responsável por receber e processar extratos bancários.
+
+Formatos aceitos:
+- OFX.
+- CSV.
+
+Funcionalidades:
+- Upload de extratos.
+- Identificação do formato.
+- Leitura e processamento dos registros.
+- Pré-visualização das movimentações encontradas.
+- Associação com uma conta financeira.
+- Identificação de movimentações duplicadas.
+- Confirmação da importação.
+- Histórico de importações.
+
+Informações extraídas quando disponíveis:
+- Data.
+- Descrição.
+- Valor.
+- Tipo de movimentação.
+- Identificador bancário.
+- Saldo após movimentação, quando disponível.
+
+Regras:
+- O sistema deverá validar o formato do arquivo.
+- A importação deverá permitir revisão antes da confirmação.
+- Registros duplicados não deverão gerar movimentações adicionais.
+- O sistema deverá utilizar identificadores bancários quando disponíveis.
+- Na ausência de identificadores, deverá utilizar uma impressão digital da movimentação (`import_fingerprint`).
+- Arquivos inválidos deverão gerar mensagens compreensíveis.
+- A importação deverá preservar a origem bancária dos registros.
+- O sistema não deverá solicitar credenciais bancárias.
+- O arquivo poderá ser descartado após o processamento, sem armazenamento permanente obrigatório.
+
+**Importante:** os formatos CSV podem variar entre instituições financeiras. O processamento deverá prever a identificação ou configuração do padrão de colunas.
+
+### RF06 — Organização automática das movimentações
+
+Funcionalidade responsável por reduzir o trabalho manual do usuário.
+
+O sistema deverá analisar as movimentações importadas e sugerir classificações.
+
+Critérios:
+- Descrição da movimentação.
+- Palavras-chave.
+- Histórico de classificações do usuário.
+- Categoria anteriormente associada a descrições semelhantes.
+- Tipo da movimentação.
+
+Funcionalidades:
+- Sugerir categorias.
+- Aplicar classificações com base em regras configuradas.
+- Permitir alteração manual.
+- Identificar movimentações sem categoria.
+- Permitir criação de regras automáticas futuramente.
+
+Regras:
+- A classificação deverá respeitar o tipo da movimentação.
+- O usuário poderá corrigir classificações incorretas.
+- O sistema deverá permitir identificar movimentações que precisam de revisão.
+- A classificação não poderá alterar o valor ou a data original da movimentação.
+
+### RF07 — Conciliação financeira
+
+Funcionalidade responsável por relacionar registros manuais com movimentações identificadas nos extratos bancários.
+
+O objetivo é evitar registros duplicados e permitir que o usuário confira se suas anotações correspondem às movimentações reais da conta.
 
 Critérios para sugestões:
 - Valor.
 - Data.
-- CPF/CNPJ do emissor ou destinatário.
 - Descrição.
-- Pagador ou recebedor, quando disponível.
+- Conta relacionada.
+- Tipo da movimentação.
 
 Status:
 - Pendente.
 - Sugerida.
 - Conciliada.
-- Parcialmente conciliada.
 - Divergente.
 
 Funcionalidades:
 - Gerar sugestões de correspondência.
 - Confirmar conciliações manualmente.
 - Rejeitar sugestões.
-- Conciliar pagamentos parciais.
-- Relacionar vários pagamentos a um documento.
-- Relacionar vários documentos a uma movimentação.
-- Consultar divergências.
+- Identificar possíveis registros duplicados.
+- Consultar movimentações não conciliadas.
 - Desfazer conciliações.
+- Consultar histórico de conciliação.
 
 Regras:
 - O sistema nunca confirmará uma conciliação sem ação do usuário.
-- Uma sugestão não altera o saldo nem confirma um pagamento.
-- A soma dos valores conciliados não poderá ultrapassar o valor disponível da movimentação ou do documento.
-- Movimentações sem documentos correspondentes continuarão válidas.
-- Os documentos e as movimentações envolvidos deverão pertencer ao mesmo perfil financeiro.
+- Uma sugestão não deverá alterar o saldo financeiro.
+- Movimentações conciliadas deverão manter o relacionamento entre o registro manual e o registro bancário.
+- A mesma movimentação bancária não poderá ser conciliada com vários registros manuais independentes.
+- A conciliação não poderá provocar dupla contabilização de valores.
+- Registros sem correspondência continuarão válidos.
 
-### RF07 — Dashboard
+**Exemplo:**
+
+O usuário registra manualmente uma despesa de R$ 150,00.
+
+Posteriormente, importa um extrato que contém uma saída de R$ 150,00 na mesma conta e em uma data próxima.
+
+O ConciliaMEI identifica a possível correspondência e apresenta uma sugestão.
+
+O usuário poderá confirmar que os dois registros representam a mesma movimentação.
+
+Após a confirmação, os registros serão relacionados, evitando que a despesa seja contabilizada duas vezes.
+
+### RF08 — Dashboard financeiro
 
 Apresentar uma visão geral das finanças do usuário.
 
 Indicadores:
-- Saldo total.
-- Receitas.
-- Despesas.
-- Evolução financeira por período.
+- Saldo total das contas.
+- Total de receitas.
+- Total de despesas.
+- Resultado financeiro do período.
+- Evolução financeira mensal.
+- Despesas por categoria.
+- Receitas por categoria.
 - Movimentações recentes.
-- Quantidade de documentos conciliados.
-- Quantidade de documentos pendentes.
-- Possíveis divergências.
+- Movimentações pendentes de categorização.
+- Movimentações pendentes de conciliação.
 
 Filtros:
 - Período.
 - Conta.
 - Categoria.
+- Tipo de movimentação.
 
-Todos os indicadores deverão utilizar dados reais do banco de dados, sem depender de valores mockados.
+Regras:
+- Todos os indicadores deverão utilizar dados reais do banco.
+- Transferências entre contas próprias não deverão distorcer os indicadores de receitas e despesas.
+- Movimentações manuais e bancárias conciliadas não poderão ser contabilizadas em duplicidade.
+- Os saldos deverão respeitar a data de referência de cada conta.
 
 ## 6. Requisitos não funcionais
 
 **RNF01 — Segurança**
 - Autenticação JWT.
 - Proteção de rotas.
-- Validação de propriedade dos dados.
-- Isolamento entre perfis financeiros.
+- Validação de propriedade dos registros.
+- Isolamento dos dados por usuário.
 
 **RNF02 — Privacidade**
-- Usuários não poderão acessar documentos ou movimentações de outras contas.
-- Arquivos armazenados no B2 deverão ter acesso controlado.
-- Segredos e credenciais nunca deverão ser enviados ao frontend.
+- Usuários não poderão acessar dados financeiros de terceiros.
+- Arquivos importados deverão ser processados com segurança.
+- Credenciais bancárias nunca deverão ser solicitadas ou armazenadas.
+- Dados pessoais e financeiros deverão ter acesso controlado.
 
 **RNF03 — Integridade**
 - Operações financeiras críticas deverão utilizar transações do banco.
 - Valores monetários deverão utilizar `BigDecimal`.
 - Relacionamentos deverão possuir restrições de integridade.
+- Conciliações deverão impedir contabilização duplicada.
 
 **RNF04 — Confiabilidade**
 - Validar arquivos importados.
 - Identificar duplicidades.
-- Tratar falhas no processamento de documentos e extratos.
+- Tratar erros de processamento.
+- Evitar importações parciais inconsistentes.
+- Preservar a integridade dos registros financeiros.
 
 **RNF05 — Manutenibilidade**
 - Separar controllers, services, repositories, entidades e DTOs.
 - Manter regras de negócio no backend.
-- Separar processadores de XML e PDF.
+- Separar processadores OFX e CSV.
+- Centralizar regras de categorização e conciliação.
 
 **RNF06 — Usabilidade**
 - Interface responsiva.
-- Indicadores claros.
+- Indicadores financeiros claros.
 - Mensagens de erro compreensíveis.
-- Confirmação explícita de operações importantes.
+- Pré-visualização dos extratos.
+- Confirmação explícita das operações importantes.
 
 **RNF07 — Auditoria**
-- Registrar operações importantes, principalmente confirmações e cancelamentos de conciliação.
+- Registrar importações realizadas.
+- Registrar confirmações e cancelamentos de conciliação.
+- Preservar informações necessárias para rastrear alterações financeiras importantes.
 
 **RNF08 — LGPD**
 - Proteger dados pessoais e financeiros.
-- Controlar acesso e retenção de documentos.
-- Permitir tratamento adequado dos dados do usuário.
+- Limitar a coleta de informações ao necessário.
+- Permitir exclusão e tratamento adequado dos dados do usuário.
+- Garantir isolamento entre usuários.
 
 ## 7. Modelo de dados
 
 ### User
-Entidade existente, responsável pela autenticação.
 
-### FinancialProfile
-Representa o perfil financeiro do usuário.
+Entidade existente, responsável pela autenticação e propriedade dos dados financeiros.
 
-Campos principais:
-- `id`
-- `user_id`
-- `profile_type`
-- `display_name`
-- `tax_id`
-- `created_at`
-
-Relacionamento: User 1:1 FinancialProfile.
+Relacionamento:
+- User 1:N Account.
+- User 1:N Category.
 
 ### Account
+
 Representa uma conta financeira.
 
 Campos principais:
 - `id`
-- `profile_id`
+- `user_id`
 - `name`
 - `bank_name`
 - `account_type`
@@ -335,22 +425,25 @@ Campos principais:
 - `active`
 - `created_at`
 
-Relacionamento: FinancialProfile 1:N Account.
+Relacionamento: User 1:N Account.
 
 ### Category
+
 Representa uma categoria de receita ou despesa.
 
 Campos principais:
 - `id`
-- `profile_id`
+- `user_id`
 - `name`
 - `category_type`
 - `active`
 - `is_default`
+- `created_at`
 
-Relacionamento: FinancialProfile 1:N Category.
+Relacionamento: User 1:N Category.
 
 ### FinancialTransaction
+
 Representa uma movimentação financeira.
 
 Campos principais:
@@ -367,51 +460,47 @@ Campos principais:
 - `transfer_group_id`
 - `created_at`
 
-Relacionamento: Account 1:N FinancialTransaction.
+Relacionamento:
+- Account 1:N FinancialTransaction.
+- Category 1:N FinancialTransaction.
 
-### FinancialDocument
-Representa uma nota fiscal ou comprovante.
+### BankImport
+
+Representa uma importação de extrato bancário.
 
 Campos principais:
 - `id`
-- `profile_id`
-- `document_type`
-- `document_number`
-- `issuer_tax_id`
-- `recipient_tax_id`
-- `amount`
-- `issue_date`
-- `file_key`
+- `account_id`
 - `file_name`
-- `mime_type`
-- `file_hash`
+- `file_type`
+- `total_transactions`
+- `imported_at`
 - `status`
-- `created_at`
 
-Relacionamento: FinancialProfile 1:N FinancialDocument.
+Relacionamento: Account 1:N BankImport.
 
 ### Reconciliation
-Representa a relação entre uma movimentação e um documento.
+
+Representa a correspondência entre uma movimentação manual e uma movimentação bancária.
 
 Campos principais:
 - `id`
 - `transaction_id`
-- `document_id`
-- `matched_amount`
+- `matched_transaction_id`
 - `status`
-- `matching_method`
 - `created_at`
+- `confirmed_at`
 
-Relacionamento: FinancialTransaction N:N FinancialDocument, através de Reconciliation.
+Relacionamento: FinancialTransaction 1:1 FinancialTransaction, por meio de Reconciliation, considerando o registro manual e o registro bancário.
+
+**Observação arquitetural:** o modelo deverá impedir que duas movimentações representando o mesmo evento financeiro sejam contabilizadas simultaneamente. A conciliação deverá manter os dois registros rastreáveis, mas garantir uma única contabilização.
 
 ## 8. APIs REST previstas
 
-- `/api/profiles`
 - `/api/accounts`
-- `/api/categories`
 - `/api/transactions`
+- `/api/categories`
 - `/api/imports`
-- `/api/documents`
 - `/api/reconciliations`
 - `/api/dashboard`
 
@@ -419,32 +508,41 @@ Principais operações:
 
 | Método | Endpoint | Objetivo |
 |---|---|---|
-| GET | `/api/profiles/me` | Consultar perfil |
-| PUT | `/api/profiles/me` | Atualizar perfil |
-| POST | `/api/accounts` | Cadastrar conta |
 | GET | `/api/accounts` | Listar contas |
-| POST | `/api/transactions` | Registrar movimentação |
+| POST | `/api/accounts` | Cadastrar conta |
+| GET | `/api/accounts/{id}` | Consultar conta |
+| PUT | `/api/accounts/{id}` | Atualizar conta |
 | GET | `/api/transactions` | Listar movimentações |
-| POST | `/api/imports/bank-statement` | Importar OFX/CSV |
-| POST | `/api/documents` | Importar XML/PDF |
-| GET | `/api/documents` | Listar documentos |
+| POST | `/api/transactions` | Registrar movimentação |
+| PUT | `/api/transactions/{id}` | Editar movimentação |
+| DELETE | `/api/transactions/{id}` | Excluir movimentação |
+| GET | `/api/categories` | Listar categorias |
+| POST | `/api/categories` | Criar categoria |
+| POST | `/api/imports/ofx` | Importar extrato OFX |
+| POST | `/api/imports/csv` | Importar extrato CSV |
+| GET | `/api/imports` | Consultar histórico de importações |
 | GET | `/api/reconciliations/suggestions` | Consultar sugestões |
 | POST | `/api/reconciliations` | Confirmar conciliação |
 | DELETE | `/api/reconciliations/{id}` | Desfazer conciliação |
 | GET | `/api/dashboard` | Consultar indicadores |
 
-A autorização deverá utilizar o usuário autenticado para resolver o perfil financeiro. O frontend não poderá determinar livremente a qual usuário ou perfil os registros pertencem.
+A autorização deverá utilizar o usuário autenticado para identificar a propriedade das contas e movimentações.
+
+O frontend não poderá determinar livremente a qual usuário os registros pertencem.
 
 ## 9. Navegação do frontend
 
+A navegação principal deverá conter:
+
 - Dashboard.
-- Contas.
+- Contas bancárias.
 - Movimentações.
-- Documentos.
-- Conciliação.
+- Importar extrato.
 - Configurações.
 
-A opção de emissão de notas fiscais deverá ser removida da navegação.
+A interface deverá priorizar a simplicidade e facilitar a visualização das informações financeiras.
+
+As opções relacionadas a emissão de notas, cadastro empresarial, documentos fiscais e gestão de empresas deverão ser removidas.
 
 ## 10. Integrações futuras
 
@@ -452,77 +550,112 @@ A opção de emissão de notas fiscais deverá ser removida da navegação.
 
 Não fará parte do MVP.
 
-Em uma etapa futura, poderá permitir a conexão com instituições financeiras por meio de um provedor autorizado, mediante consentimento do usuário.
+Em uma etapa futura, o sistema poderá permitir que o usuário autorize a conexão com suas instituições financeiras por meio de um provedor de integração adequado.
 
-O sistema não deverá solicitar ou armazenar senhas bancárias.
+Possibilidades:
+- Conexão com instituições financeiras.
+- Sincronização automática de movimentações.
+- Atualização de saldos.
+- Importação periódica de transações.
+- Redução da necessidade de importações manuais.
 
-### Expansões possíveis
-- Múltiplos perfis financeiros por usuário.
+Regras:
+- A conexão dependerá do consentimento do usuário.
+- O sistema não deverá solicitar ou armazenar senhas bancárias.
+- A integração deverá respeitar os requisitos de segurança e privacidade aplicáveis.
+
+### Outras expansões possíveis
+
+- Regras personalizadas de categorização.
 - Relatórios financeiros avançados.
-- Categorias personalizadas e regras automáticas.
+- Exportação de relatórios.
 - Notificações de movimentações.
-- Integrações bancárias automáticas.
+- Planejamento de orçamento mensal.
+- Metas financeiras.
+- Inteligência artificial para classificação de despesas.
+
+Essas funcionalidades não fazem parte do MVP.
 
 ## 11. Plano de implementação
 
-**Fase 1 — Fundação do domínio**
-- Criar entidades financeiras.
-- Definir relacionamentos JPA.
-- Criar repositories.
-- Configurar integridade do banco.
-- Planejar migração dos dados legados.
+**Fase 1 — Adequação do domínio**
+- Analisar entidades e relacionamentos existentes.
+- Remover dependência do perfil empresarial.
+- Planejar migração das tabelas antigas.
+- Definir o novo relacionamento entre usuário e contas.
+- Preservar autenticação e JWT.
 
-**Fase 2 — Perfil e contas**
-- Criar perfil financeiro.
-- Vincular perfil ao cadastro de usuário.
-- Implementar CRUD de contas.
-- Implementar categorias padrão.
+**Fase 2 — Contas financeiras**
+- Criar entidade Account.
+- Implementar repositories.
+- Implementar CRUD.
+- Vincular contas ao usuário autenticado.
+- Implementar cálculo de saldo.
 
 **Fase 3 — Movimentações**
-- CRUD de movimentações.
-- Cálculo de saldo.
-- Transferências entre contas.
-- Filtros e consultas.
+- Criar entidade FinancialTransaction.
+- Implementar CRUD.
+- Criar categorias padrão.
+- Implementar filtros.
+- Implementar transferências entre contas.
 
 **Fase 4 — Importação bancária**
-- Upload OFX/CSV.
-- Leitura dos arquivos.
-- Pré-visualização.
-- Detecção de duplicidades.
-- Confirmação da importação.
+- Implementar processador OFX.
+- Implementar processador CSV.
+- Implementar pré-visualização.
+- Identificar duplicidades.
+- Implementar confirmação da importação.
+- Criar histórico de importações.
 
-**Fase 5 — Documentos**
-- Upload XML/PDF.
-- Armazenamento B2.
-- Extração de dados.
-- Identificação de duplicidades.
+**Fase 5 — Organização automática**
+- Implementar regras de categorização.
+- Criar sugestões de categorias.
+- Permitir correção manual.
+- Identificar movimentações sem categoria.
 
 **Fase 6 — Conciliação**
-- Motor de sugestões.
-- Confirmação manual.
-- Pagamentos parciais.
-- Divergências.
-- Desfazer conciliação.
+- Implementar sugestões de correspondência.
+- Permitir confirmação manual.
+- Impedir contabilização duplicada.
+- Implementar cancelamento de conciliações.
+- Registrar histórico.
 
 **Fase 7 — Dashboard**
-- Indicadores reais.
-- Gráficos.
-- Filtros.
-- Histórico financeiro.
+- Implementar indicadores financeiros.
+- Criar gráficos de receitas e despesas.
+- Implementar filtros.
+- Apresentar movimentações recentes.
+- Integrar os dados reais do backend.
 
-**Fase 8 — Evolução**
-- Open Finance.
-- Múltiplos perfis.
-- Novas integrações.
+**Fase 8 — Finalização**
+- Implementar testes automatizados.
+- Revisar segurança.
+- Validar importações com extratos reais de teste.
+- Revisar interface.
+- Atualizar README e documentação.
+- Preparar apresentação do projeto.
 
 ## 12. Diretrizes de desenvolvimento
 
 - Preservar a autenticação e o JWT existentes.
-- Manter Java 21 e o padrão UUID em String.
-- Não apagar entidades e tabelas antigas antes de planejar a migração.
+- Manter Java 21 e UUID em String.
+- Não apagar tabelas antigas antes de planejar a migração.
+- Remover gradualmente as dependências empresariais e fiscais.
 - Não misturar regras de negócio com controllers.
 - Não confiar em IDs enviados pelo frontend para autorização.
+- Garantir isolamento financeiro entre usuários.
 - Implementar e testar cada fase antes de avançar.
-- Priorizar um MVP funcional, sem adicionar funcionalidades de ERP que não fazem parte da proposta.
+- Priorizar um MVP funcional.
+- Evitar funcionalidades de ERP, contabilidade e emissão fiscal.
 
-**Objetivo do MVP:** permitir que um usuário organize suas contas, registre ou importe movimentações, importe documentos fiscais e comprovantes e confirme manualmente as correspondências sugeridas pelo sistema.
+---
+
+## 13. Objetivo final do MVP
+
+Permitir que pessoas físicas, MEIs e autônomos organizem suas finanças por meio da importação de extratos bancários, cadastro de movimentações e categorização automática de receitas e despesas.
+
+O sistema deverá identificar possíveis duplicidades, sugerir correspondências entre registros manuais e movimentações bancárias e permitir que o usuário confirme essas conciliações.
+
+O resultado será uma plataforma simples, segura e funcional, que facilite o acompanhamento financeiro sem exigir controles empresariais ou fiscais complexos.
+
+**Proposta central:** importar, organizar, categorizar e conciliar movimentações financeiras em um único lugar.

@@ -2,7 +2,7 @@ const configuredUrl = import.meta.env.VITE_API_URL?.trim();
 
 const API_URL = configuredUrl || (
     import.meta.env.DEV
-        ? "https://conciliamei-w4ni.onrender.com"
+        ? "http://localhost:3001"
         : null
 );
 
