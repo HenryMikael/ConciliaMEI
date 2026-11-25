@@ -20,6 +20,7 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(cors({
     origin: allowedOrigins,
+    credentials: true
 }));
 
 app.use(express.json({ limit: '1mb'}));
