@@ -1,60 +1,95 @@
 import API_URL from "./apiConfig";
+import { setAccessToken, clearAccessToken } from "../lib/tokenStore";
 
 const AUTH_URL = `${API_URL}/api/auth`;
 
-async function tratarResposta(response) {
+async function parseResponse(response) {
     const data = await response.json().catch(() => null);
 
     if (!response.ok) {
-        if (response.status === 409 || response.status === 400) {
-            throw new Error(data?.message || "Não foi possível concluir a operação. Verifique os dados informados.");
-        }
-        if (response.status >= 500) {
-            throw new Error("O servidor encontrou um problema. Tente novamente mais tarde.");
-        }
-        throw new Error(data?.message || "E-mail ou senha inválidos.");
+        throw new Error(
+            data?.message || "Não foi possível concluir a operação."
+        );
     }
 
     return data;
 }
 
-async function enviar(path, payload) {
+async function post(path, payload) {
     let response;
 
     try {
         response = await fetch(`${AUTH_URL}${path}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
             body: JSON.stringify(payload),
-            credentials: "include" // Inclui cookies na requisição
         });
-    } catch (error){
-        console.error("Erro no fetch:", error); // debugar no console F12
-        throw new Error("Não foi possível conectar à API. Verifique se o servidor está disponível.");
+    } catch {
+        throw new Error("Não foi possível conectar ao servidor.");
     }
 
-    return tratarResposta(response);
+    return parseResponse(response);
 }
 
-export function login(email, password) {
-    return enviar("/login", { email, password });
+export async function login(email, password) {
+    const result = await post("/login", { email, password });
+    const token = result?.data?.accessToken;
+
+    if (!token) {
+        throw new Error("O servidor não retornou um token.");
+    }
+
+    setAccessToken(token);
+
+    return result.data;
 }
 
-export function register(name, email, password) {
-    return enviar("/register", { name, email, password });
+export async function register(name, email, password) {
+    return post("/register", { name, email, password });
 }
 
-export async function refreshToken() {
-    let response;
+export async function restoreSession() {
     try {
-        response = await fetch(`${AUTH_URL}/refresh`, {
+        const response = await fetch(`${AUTH_URL}/refresh`, {
             method: "POST",
-            headers: { "Accept": "application/json" },
-            credentials: "include", // Envia o cookie HttpOnly automaticamente
+            headers: { Accept: "application/json" },
+            credentials: "include",
         });
-    } catch (error) {
-        throw new Error("Falha ao renovar sessão.");
-    }
 
-    return tratarResposta(response);
+        if (!response.ok) {
+            clearAccessToken();
+            return null;
+        }
+
+        const result = await response.json();
+        const token = result?.data?.accessToken;
+
+        if (!token) {
+            clearAccessToken();
+            return null;
+        }
+
+        setAccessToken(token);
+
+        return result.data;
+    } catch {
+        clearAccessToken();
+        return null;
+    }
+}
+
+export async function logout() {
+    try {
+        await fetch(`${AUTH_URL}/logout`, {
+            method: "POST",
+            headers: { Accept: "application/json" },
+            credentials: "include",
+        });
+    } finally {
+        clearAccessToken();
+    }
 }

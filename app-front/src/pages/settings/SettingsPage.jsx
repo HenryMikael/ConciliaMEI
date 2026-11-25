@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import LGPDTermsButton from "@/components/LGPDTermsButton";
+import LGPDTermsButton from "@/components/ui/LGPDTermsButton";
 import { cn } from "@/lib/utils";
 
 /*
@@ -150,13 +150,6 @@ export default function SettingsPage({
         onChange: (e) => { setPwd((p) => ({ ...p, [key]: e.target.value })); setFeedback({ ok: "", error: "" }); },
     });
 
-    const Feedback = () => (
-        <>
-            {feedback.error && <p role="alert" className="text-sm font-medium text-destructive">{feedback.error}</p>}
-            {feedback.ok && <p role="status" className="text-sm text-muted-foreground">{feedback.ok}</p>}
-        </>
-    );
-
     return (
         <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             <header className="mb-6">
@@ -212,7 +205,18 @@ export default function SettingsPage({
                                     <Field id="senhaConfirmar" label="Confirmar nova senha">
                                         <Input id="senhaConfirmar" type="password" autoComplete="new-password" {...bindPwd("confirm")} />
                                     </Field>
-                                    <Feedback />
+                                    <>
+                                        {feedback.error && (
+                                            <p role="alert" className="text-sm font-medium text-destructive">
+                                                {feedback.error}
+                                            </p>
+                                        )}
+                                        {feedback.ok && (
+                                            <p role="status" className="text-sm text-muted-foreground">
+                                                {feedback.ok}
+                                            </p>
+                                        )}
+                                    </>
                                     <div className="flex justify-end">
                                         <Button type="submit" disabled={!onChangePassword}>Salvar alterações</Button>
                                     </div>
@@ -275,7 +279,18 @@ export default function SettingsPage({
                             ) : (
                                 <Empty>Nenhuma conta cadastrada. Adicione uma conta para importar seus extratos.</Empty>
                             )}
-                            <div className="mt-3"><Feedback /></div>
+                            <div className="mt-3"><>
+                                {feedback.error && (
+                                    <p role="alert" className="text-sm font-medium text-destructive">
+                                        {feedback.error}
+                                    </p>
+                                )}
+                                {feedback.ok && (
+                                    <p role="status" className="text-sm text-muted-foreground">
+                                        {feedback.ok}
+                                    </p>
+                                )}
+                            </></div>
                         </SectionCard>
                     )}
 
@@ -320,7 +335,18 @@ export default function SettingsPage({
                                         </div>
                                     );
                                 })}
-                                <Feedback />
+                                <>
+                                    {feedback.error && (
+                                        <p role="alert" className="text-sm font-medium text-destructive">
+                                            {feedback.error}
+                                        </p>
+                                    )}
+                                    {feedback.ok && (
+                                        <p role="status" className="text-sm text-muted-foreground">
+                                            {feedback.ok}
+                                        </p>
+                                    )}
+                                </>
                             </div>
                         </SectionCard>
                     )}
@@ -330,10 +356,10 @@ export default function SettingsPage({
                             <div className="grid max-w-md gap-5">
                                 <div className="grid gap-5 sm:grid-cols-2">
                                     <Field id="moeda" label="Moeda">
-                                        <SelectField id="moeda" value="BRL" disabled onChange={() => {}} options={[{ value: "BRL", label: "Real brasileiro (BRL)" }]} />
+                                        <SelectField id="moeda" value="BRL" disabled onChange={() => { }} options={[{ value: "BRL", label: "Real brasileiro (BRL)" }]} />
                                     </Field>
                                     <Field id="formatoData" label="Formato de data">
-                                        <SelectField id="formatoData" value="dmy" disabled onChange={() => {}} options={[{ value: "dmy", label: "DD/MM/AAAA" }]} />
+                                        <SelectField id="formatoData" value="dmy" disabled onChange={() => { }} options={[{ value: "dmy", label: "DD/MM/AAAA" }]} />
                                     </Field>
                                 </div>
                                 <Field id="periodo" label="Período padrão do dashboard">
@@ -348,7 +374,18 @@ export default function SettingsPage({
                                         onChange={(v) => { setPrefs((p) => ({ ...p, hideValues: v })); setFeedback({ ok: "", error: "" }); }}
                                     />
                                 </div>
-                                <Feedback />
+                                <>
+                                    {feedback.error && (
+                                        <p role="alert" className="text-sm font-medium text-destructive">
+                                            {feedback.error}
+                                        </p>
+                                    )}
+                                    {feedback.ok && (
+                                        <p role="status" className="text-sm text-muted-foreground">
+                                            {feedback.ok}
+                                        </p>
+                                    )}
+                                </>
                                 <div className="flex justify-end">
                                     <Button type="button" disabled={!onSavePreferences}
                                         onClick={() => run(() => onSavePreferences(prefs), "Preferências salvas")}>
@@ -391,7 +428,18 @@ export default function SettingsPage({
                                             </Button>
                                         </div>
                                     )}
-                                    <Feedback />
+                                    <>
+                                        {feedback.error && (
+                                            <p role="alert" className="text-sm font-medium text-destructive">
+                                                {feedback.error}
+                                            </p>
+                                        )}
+                                        {feedback.ok && (
+                                            <p role="status" className="text-sm text-muted-foreground">
+                                                {feedback.ok}
+                                            </p>
+                                        )}
+                                    </>
                                 </div>
                             </div>
                         </SectionCard>
