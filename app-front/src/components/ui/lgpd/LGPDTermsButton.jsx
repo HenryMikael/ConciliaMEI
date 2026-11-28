@@ -4,7 +4,7 @@ import { ptBR } from "date-fns/locale";
 import { X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { LGPDNoticeBody, LGPDNoticeHeader } from "@/components/ui/LGPDNotice";// Ajuste o caminho do Notice se necessário
+import { LGPDNoticeBody, LGPDNoticeHeader } from "@/components/LGPDNotice";
 import { LGPD_DIALOG_CLASS, getLGPDAcceptedAt } from "@/lib/lgpd";
 
 function acceptedLabel(iso) {

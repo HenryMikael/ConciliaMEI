@@ -1,19 +1,36 @@
 import { useState } from 'react';
 import { ArrowLeft, ArrowRight, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import AuthLayout, { AuthField, AuthNotice } from '../../../components/layout/AuthLayout';
+import AuthLayout, { AuthField, AuthNotice } from "../../../components/layout/AuthLayout";
+import { forgotPassword } from "../../../api/authApi";
 
 
 export default function ForgotPasswordPage() {
+    const [email, setEmail] = useState('');
     const [notice, setNotice] = useState('');
+    const [noticeType, setNoticeType] = useState('error');
+    const [loading, setLoading] = useState(false);
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
 
-        // Mensagem neutra de propósito: não revela se o e-mail existe ou não.
-        setNotice(
-            'Se o e-mail estiver cadastrado, enviaremos um link para redefinir sua senha. Verifique sua caixa de entrada e a pasta de spam.'
-        );
+        setLoading(true);
+        setNotice('');
+
+        try {
+            await forgotPassword(email);
+
+            // Mensagem neutra de propósito: não revela se o e-mail existe ou não.
+            setNoticeType('success');
+            setNotice(
+                'Se o e-mail estiver cadastrado, enviaremos um link para redefinir sua senha. Verifique sua caixa de entrada e a pasta de spam.'
+            );
+        } catch (err) {
+            setNoticeType('error');
+            setNotice(err.message || 'Não foi possível enviar o link. Tente novamente.');
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -38,14 +55,17 @@ export default function ForgotPasswordPage() {
                     type="email"
                     placeholder="seu@email.com"
                     autoComplete="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
                     required
                 />
 
                 <button
                     className="auth-button auth-button-primary flex w-full items-center justify-center gap-2"
                     type="submit"
+                    disabled={loading}
                 >
-                    <span>Enviar link</span>
+                    <span>{loading ? 'Enviando...' : 'Enviar link'}</span>
                     <ArrowRight
                         size={16}
                         className="shrink-0"
@@ -53,7 +73,7 @@ export default function ForgotPasswordPage() {
                 </button>
 
                 {notice && (
-                    <AuthNotice>
+                    <AuthNotice type={noticeType}>
                         {notice}
                     </AuthNotice>
                 )}

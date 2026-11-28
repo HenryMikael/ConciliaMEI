@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import { Button } from './button';
-import { LGPDNoticeBody, LGPDNoticeHeader } from '../ui/LGPDnotice'
-import { LGPD_DIALOG_CLASS, acceptLGPD, hasAcceptedLGPD } from '../../lib/lgpd';
+import { useEffect, useRef, useState } from "react";
 
-/*
+import { Button } from "@/components/ui/button";
+import { LGPDNoticeBody, LGPDNoticeHeader } from "@/components/LGPDNotice";
+import { LGPD_DIALOG_CLASS, acceptLGPD, hasAcceptedLGPD } from "@/lib/lgpd";
+
+/**
  * Aviso obrigatório: só aparece se o usuário ainda não confirmou (em nenhuma página).
  * Não fecha por Esc nem por clique fora. Use <LGPDPopup /> no Login e na futura hero page.
  */

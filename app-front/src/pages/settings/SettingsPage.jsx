@@ -1,3 +1,4 @@
+import { changePassword as changePasswordApi, deleteAccount as deleteAccountApi } from "@/api/authApi";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Info, Landmark, LogOut, Pencil, Plus, ShieldCheck, SlidersHorizontal, Tags, Trash2, User } from "lucide-react";
@@ -7,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import LGPDTermsButton from "@/components/ui/LGPDTermsButton";
+import LGPDTermsButton from "@/components/LGPDTermsButton";
 import { cn } from "@/lib/utils";
 
 /*
@@ -21,7 +22,7 @@ import { cn } from "@/lib/utils";
  * Callbacks (async; se lançarem erro, a mensagem aparece na tela):
  *   onChangePassword({ current, next }), onAddAccount(), onEditAccount(account), onToggleAccount(account),
  *   onAddCategory(type), onEditCategory(category), onDeleteCategory(category),
- *   onSavePreferences(prefs), onRequestDeletion()
+ *   onSavePreferences(prefs), 
  * privacyUrl, termsUrl, appVersion: opcionais
  */
 
@@ -100,7 +101,7 @@ const Empty = ({ children }) => <p className="py-6 text-center text-sm text-mute
 export default function SettingsPage({
     user, accounts = [], categories = [], preferences,
     onChangePassword, onAddAccount, onEditAccount, onToggleAccount,
-    onAddCategory, onEditCategory, onDeleteCategory, onSavePreferences, onRequestDeletion,
+    onAddCategory, onEditCategory, onDeleteCategory, onSavePreferences,
     privacyUrl, termsUrl, appVersion,
 }) {
     const navigate = useNavigate();
@@ -109,6 +110,8 @@ export default function SettingsPage({
     const [pwd, setPwd] = useState({ current: "", next: "", confirm: "" });
     const [prefs, setPrefs] = useState({ defaultPeriod: "month", hideValues: false, ...preferences });
     const [confirmingDeletion, setConfirmingDeletion] = useState(false);
+    const [deletionPassword, setDeletionPassword] = useState("");
+    const [deletingAccount, setDeletingAccount] = useState(false);
 
     const userName = user?.name || localStorage.getItem("name");
 
@@ -135,20 +138,71 @@ export default function SettingsPage({
         e.preventDefault();
         if (pwd.next.length < 8) return setFeedback({ ok: "", error: "A nova senha precisa ter pelo menos 8 caracteres." });
         if (pwd.next !== pwd.confirm) return setFeedback({ ok: "", error: "As senhas não coincidem. Digite a mesma senha nos dois campos." });
-        const ok = await run(() => onChangePassword({ current: pwd.current, next: pwd.next }), "Senha alterada");
+        if (!pwd.current) {
+            setFeedback({ ok: "", error: "Informe sua senha atual." });
+            return;
+        }
+
+        const ok = await run(() => {
+            if (onChangePassword) {
+                return onChangePassword({
+                    current: pwd.current,
+                    next: pwd.next,
+                });
+            }
+
+            return changePasswordApi(pwd.current, pwd.next);
+        }, "Senha alterada");
         if (ok) setPwd({ current: "", next: "", confirm: "" });
     }
 
     function handleLogout() {
         localStorage.removeItem("token");
         localStorage.removeItem("name");
-        navigate("/auth/sign-up", { replace: true });
+        localStorage.removeItem("user");
+        navigate("/auth/login", { replace: true });
+    }
+
+    async function handleDeleteAccount(e) {
+        e.preventDefault();
+
+        if (!deletionPassword) {
+            setFeedback({ ok: "", error: "Informe sua senha atual para confirmar a exclusão." });
+            return;
+        }
+
+        setDeletingAccount(true);
+        setFeedback({ ok: "", error: "" });
+
+        try {
+            await deleteAccountApi(deletionPassword);
+
+            localStorage.removeItem("token");
+            localStorage.removeItem("name");
+            localStorage.removeItem("user");
+
+            navigate("/auth/login", { replace: true });
+        } catch (err) {
+            setFeedback({
+                ok: "",
+                error: err?.message || "Não foi possível excluir sua conta.",
+            });
+        } finally {
+            setDeletingAccount(false);
+        }
     }
 
     const bindPwd = (key) => ({
         value: pwd[key],
         onChange: (e) => { setPwd((p) => ({ ...p, [key]: e.target.value })); setFeedback({ ok: "", error: "" }); },
     });
+
+    const renderFeedback = () => (
+        <>
+            {feedback.error && <p role="alert" className="text-sm font-medium text-destructive">{feedback.error}</p>}
+            {feedback.ok && <p role="status" className="text-sm text-muted-foreground">{feedback.ok}</p>}
+        </>
+    );
 
     return (
         <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -205,20 +259,9 @@ export default function SettingsPage({
                                     <Field id="senhaConfirmar" label="Confirmar nova senha">
                                         <Input id="senhaConfirmar" type="password" autoComplete="new-password" {...bindPwd("confirm")} />
                                     </Field>
-                                    <>
-                                        {feedback.error && (
-                                            <p role="alert" className="text-sm font-medium text-destructive">
-                                                {feedback.error}
-                                            </p>
-                                        )}
-                                        {feedback.ok && (
-                                            <p role="status" className="text-sm text-muted-foreground">
-                                                {feedback.ok}
-                                            </p>
-                                        )}
-                                    </>
+                                    {renderFeedback()}
                                     <div className="flex justify-end">
-                                        <Button type="submit" disabled={!onChangePassword}>Salvar alterações</Button>
+                                        <Button type="submit" >Salvar alterações</Button>
                                     </div>
                                 </form>
                             </SectionCard>
@@ -279,18 +322,7 @@ export default function SettingsPage({
                             ) : (
                                 <Empty>Nenhuma conta cadastrada. Adicione uma conta para importar seus extratos.</Empty>
                             )}
-                            <div className="mt-3"><>
-                                {feedback.error && (
-                                    <p role="alert" className="text-sm font-medium text-destructive">
-                                        {feedback.error}
-                                    </p>
-                                )}
-                                {feedback.ok && (
-                                    <p role="status" className="text-sm text-muted-foreground">
-                                        {feedback.ok}
-                                    </p>
-                                )}
-                            </></div>
+                            <div className="mt-3">{renderFeedback()}</div>
                         </SectionCard>
                     )}
 
@@ -335,18 +367,7 @@ export default function SettingsPage({
                                         </div>
                                     );
                                 })}
-                                <>
-                                    {feedback.error && (
-                                        <p role="alert" className="text-sm font-medium text-destructive">
-                                            {feedback.error}
-                                        </p>
-                                    )}
-                                    {feedback.ok && (
-                                        <p role="status" className="text-sm text-muted-foreground">
-                                            {feedback.ok}
-                                        </p>
-                                    )}
-                                </>
+                                {renderFeedback()}
                             </div>
                         </SectionCard>
                     )}
@@ -374,18 +395,7 @@ export default function SettingsPage({
                                         onChange={(v) => { setPrefs((p) => ({ ...p, hideValues: v })); setFeedback({ ok: "", error: "" }); }}
                                     />
                                 </div>
-                                <>
-                                    {feedback.error && (
-                                        <p role="alert" className="text-sm font-medium text-destructive">
-                                            {feedback.error}
-                                        </p>
-                                    )}
-                                    {feedback.ok && (
-                                        <p role="status" className="text-sm text-muted-foreground">
-                                            {feedback.ok}
-                                        </p>
-                                    )}
-                                </>
+                                {renderFeedback()}
                                 <div className="flex justify-end">
                                     <Button type="button" disabled={!onSavePreferences}
                                         onClick={() => run(() => onSavePreferences(prefs), "Preferências salvas")}>
@@ -397,54 +407,171 @@ export default function SettingsPage({
                     )}
 
                     {active === "privacidade" && (
-                        <SectionCard title="Privacidade e segurança" description="Como seus dados são tratados.">
-                            <div className="grid max-w-lg gap-5 text-sm">
-                                <p>
-                                    O ConciliaMEI <strong>não solicita nem armazena senhas bancárias</strong>. Os extratos são
-                                    importados manualmente, nos formatos OFX e CSV.
-                                </p>
-                                <p className="text-muted-foreground">
-                                    Guardamos apenas as informações financeiras que você cadastra ou importa: contas, movimentações
-                                    e categorias. Elas ficam disponíveis somente para a sua conta.
-                                </p>
-                                <div className="border-t pt-5"><LGPDTermsButton /></div>
+                        <SectionCard
+                            title="Privacidade e segurança"
+                            description="Saiba como o ConciliaMEI trata seus dados e protege sua privacidade."
+                        >
+                            <div className="grid max-w-2xl gap-6 text-sm">
+
+                                {/* Dados financeiros */}
+                                <div className="grid gap-2">
+                                    <h3 className="font-semibold">Dados financeiros</h3>
+
+                                    <p>
+                                        O ConciliaMEI não solicita nem armazena senhas bancárias.
+                                        Os extratos são importados manualmente pelo usuário, nos
+                                        formatos OFX e CSV.
+                                    </p>
+
+                                    <p className="text-muted-foreground">
+                                        As informações financeiras cadastradas ou importadas,
+                                        como contas, movimentações e categorias, são utilizadas
+                                        para disponibilizar as funcionalidades da plataforma.
+                                    </p>
+                                </div>
+
+                                {/* Fotografias e imagens */}
+                                <div className="grid gap-2 border-t pt-5">
+                                    <h3 className="font-semibold">
+                                        Fotografias, imagens e capturas de tela
+                                    </h3>
+
+                                    <p>
+                                        O ConciliaMEI não possui, em suas funcionalidades atuais,
+                                        recursos destinados à captura de fotografias ou gravação
+                                        de imagens dos usuários por meio da câmera do dispositivo.
+                                    </p>
+
+                                    <p>
+                                        A plataforma não utiliza reconhecimento facial ou
+                                        biometria facial como forma de identificação ou autenticação.
+                                    </p>
+
+                                    <p>
+                                        O ConciliaMEI também não realiza captura automática ou
+                                        gravação da tela do dispositivo do usuário.
+                                    </p>
+
+                                    <p>
+                                        As funcionalidades atuais não têm como finalidade coletar
+                                        ou armazenar fotografias pessoais, imagens da galeria do
+                                        dispositivo ou capturas de tela dos usuários.
+                                    </p>
+
+                                    <p>
+                                        As imagens eventualmente utilizadas pelo próprio usuário
+                                        fora da plataforma, por meio de recursos do sistema
+                                        operacional, navegador ou outros aplicativos, não são
+                                        controladas pelo ConciliaMEI.
+                                    </p>
+
+                                    <p className="text-muted-foreground">
+                                        Caso novas funcionalidades envolvendo envio, captura ou
+                                        armazenamento de imagens sejam implementadas, esta política
+                                        deverá ser atualizada para informar sua finalidade e forma
+                                        de tratamento.
+                                    </p>
+                                </div>
+
+                                {/* Tratamento de dados */}
+                                <div className="grid gap-2 border-t pt-5">
+                                    <h3 className="font-semibold">Tratamento de dados</h3>
+
+                                    <p>
+                                        Os dados fornecidos pelo usuário são utilizados para
+                                        permitir o funcionamento das funcionalidades do
+                                        ConciliaMEI, como gerenciamento de contas, movimentações
+                                        financeiras e conciliação.
+                                    </p>
+
+                                    <p className="text-muted-foreground">
+                                        O acesso às informações deve respeitar as regras de
+                                        autenticação e autorização da plataforma.
+                                    </p>
+                                </div>
+
+                                {/* Termos e LGPD */}
+                                <div className="border-t pt-5">
+                                    <LGPDTermsButton />
+                                </div>
+
+                                {/* Exclusão de conta */}
                                 <div className="grid gap-3 border-t pt-5">
                                     <div>
-                                        <p className="font-medium">Excluir conta e dados</p>
-                                        <p className="text-muted-foreground">Solicita a exclusão da sua conta e de todos os dados financeiros.</p>
+                                        <h3 className="font-semibold">Excluir conta e dados</h3>
+
+                                        <p className="text-muted-foreground">
+                                            Esta ação é permanente. Para confirmar a exclusão,
+                                            informe sua senha atual. Você será desconectado após
+                                            a conclusão da operação.
+                                        </p>
                                     </div>
+
                                     {confirmingDeletion ? (
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            <Button type="button" variant="destructive" disabled={!onRequestDeletion}
-                                                onClick={() => run(onRequestDeletion, "Solicitação de exclusão enviada")}>
-                                                Confirmar solicitação
-                                            </Button>
-                                            <Button type="button" variant="outline" onClick={() => setConfirmingDeletion(false)}>Cancelar</Button>
-                                        </div>
+                                        <form onSubmit={handleDeleteAccount} className="grid max-w-md gap-3">
+                                            <Field
+                                                id="senhaExcluirConta"
+                                                label="Senha atual"
+                                                hint="Confirme sua identidade para excluir a conta."
+                                            >
+                                                <Input
+                                                    id="senhaExcluirConta"
+                                                    type="password"
+                                                    autoComplete="current-password"
+                                                    value={deletionPassword}
+                                                    onChange={(e) => {
+                                                        setDeletionPassword(e.target.value);
+                                                        setFeedback({ ok: "", error: "" });
+                                                    }}
+                                                    disabled={deletingAccount}
+                                                />
+                                            </Field>
+
+                                            {renderFeedback()}
+
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <Button
+                                                    type="submit"
+                                                    variant="destructive"
+                                                    disabled={deletingAccount || !deletionPassword}
+                                                >
+                                                    <Trash2 />
+                                                    {deletingAccount ? "Excluindo..." : "Confirmar exclusão"}
+                                                </Button>
+
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    disabled={deletingAccount}
+                                                    onClick={() => {
+                                                        setConfirmingDeletion(false);
+                                                        setDeletionPassword("");
+                                                        setFeedback({ ok: "", error: "" });
+                                                    }}
+                                                >
+                                                    Cancelar
+                                                </Button>
+                                            </div>
+                                        </form>
                                     ) : (
                                         <div>
-                                            <Button type="button" variant="outline" disabled={!onRequestDeletion} onClick={() => setConfirmingDeletion(true)}>
-                                                <Trash2 />Solicitar exclusão
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => {
+                                                    setConfirmingDeletion(true);
+                                                    setFeedback({ ok: "", error: "" });
+                                                }}
+                                            >
+                                                <Trash2 />
+                                                Excluir minha conta
                                             </Button>
                                         </div>
                                     )}
-                                    <>
-                                        {feedback.error && (
-                                            <p role="alert" className="text-sm font-medium text-destructive">
-                                                {feedback.error}
-                                            </p>
-                                        )}
-                                        {feedback.ok && (
-                                            <p role="status" className="text-sm text-muted-foreground">
-                                                {feedback.ok}
-                                            </p>
-                                        )}
-                                    </>
                                 </div>
                             </div>
                         </SectionCard>
                     )}
-
                     {active === "sobre" && (
                         <SectionCard title="Sobre o ConciliaMEI" description="Controle financeiro e conciliação bancária.">
                             <dl className="grid max-w-xl gap-4">
